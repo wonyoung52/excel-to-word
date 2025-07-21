@@ -178,9 +178,12 @@ if api_key and uploaded_file and title_input and file_name_input:
                     cell._tc.get_or_add_tcPr().append(shading_elm)
 
         # ---------------------------- 총평 ----------------------------
-        for title in ["강의 총평", "족관 총평", "시험 난이도"]:
-            add_horizontal_line(doc.add_paragraph())
-            doc.add_paragraph(title).bold = True
+        add_horizontal_line(doc.add_paragraph())
+        add_paragraph("강의 총평", bold=True)
+        add_horizontal_line(doc.add_paragraph())
+        add_paragraph("족관 총평", bold=True)
+        add_horizontal_line(doc.add_paragraph())
+        add_paragraph("시험 난이도", bold=True)
 
         # ---------------------------- 다운로드 ----------------------------
         buffer = BytesIO()
