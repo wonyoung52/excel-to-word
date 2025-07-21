@@ -14,6 +14,32 @@ from io import BytesIO
 # ---------------------------- Streamlit UI ----------------------------
 st.title("엑셀 - 워드 자동 변환기")
 
+with st.expander("사용법 펼치기"):
+    st.markdown("""                
+    1. OpenAI API Key를 입력하세요.
+
+    2. 족보 제목을 입력하세요.
+    - 문서 맨 위에 삽입될 제목입니다.
+    - 기본값: 2024 족보
+
+    3. 저장할 파일명을 입력하세요.       
+    - 저장되는 파일명입니다. 확장자는 자동으로 입력됩니다.
+    - 기본값: 제목 없음
+                
+    4.  엑셀 파일 업로드 (.xlsx)
+    - 엑셀 파일을 업로드하세요.
+    - 반드시 문제 번호에 대하여 오름차순 정렬을 시행한 후 업로드 해주세요.
+
+    5. 다운로드
+    - 파일을 업로드 하면 변환이 자동으로 실행됩니다.
+    - 실행 시간은 문제당 1-2초입니다.
+
+    6. 유의사항
+    - 문제 번호가 정수가 아니면 "?"로 표시됩니다.
+    - 문제 내용 항목이 비어있는 경우 "복원 실패"로 표시됩니다.  
+    - 문제 내용 항목은 GPT-4o를 통해 자동 분석되므로 API 사용량에 유의하세요.
+    """)
+
 api_key = st.text_input("OpenAI API Key", type="password")
 uploaded_file = st.file_uploader("Upload (Excel .xlsx)", type=["xlsx"])
 title_input = st.text_input("Title", value="2024 족보")
