@@ -180,7 +180,7 @@ if api_key and uploaded_file and title_input and file_name_input:
 
         add_horizontal_line(doc.add_paragraph())
         doc.add_paragraph().add_run("정답 및 해설").bold = True
-        total_rows = math.ceil(max_q_number / 5 * 2) + 1
+        total_rows = math.ceil(max_q_number / 5 * 2)
         table = doc.add_table(rows=total_rows, cols=5)
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
 
