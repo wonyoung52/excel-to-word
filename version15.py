@@ -16,8 +16,8 @@ st.title("엑셀 - 워드 자동 변환기")
 
 api_key = st.text_input("OpenAI API Key", type="password")
 uploaded_file = st.file_uploader("Upload (Excel .xlsx)", type=["xlsx"])
-title_input = st.text_input("문서 제목 입력", value="2024 족보")
-file_name_input = st.text_input("저장할 파일명 입력", value="제목 없음")
+title_input = st.text_input("Title", value="2024 족보")
+file_name_input = st.text_input("File Name", value="제목 없음")
 
 # ---------------------------- GPT 처리 함수 ----------------------------
 def process_question(number, q_text, client, doc):
