@@ -107,7 +107,12 @@ def process_question(number, q_text, client, doc):
         doc.add_paragraph()
 
 # ---------------------------- 실행 조건 ----------------------------
-if api_key and uploaded_file and title_input and file_name_input:
+if "converted" not in st.session_state:
+    st.session_state["converted"] = False
+
+if st.button("Convert") and not st.session_state.get("converted", False):
+    st.session_state["converted"] = True
+
     with st.spinner("Generating..."):
         client = OpenAI(api_key=api_key)
         df = pd.read_excel(uploaded_file, header=0)
@@ -208,8 +213,8 @@ if api_key and uploaded_file and title_input and file_name_input:
             tr = row._tr
             tr_pr = tr.get_or_add_trPr()
             tr_height = OxmlElement('w:trHeight')
-            tr_height.set(qn('w:val'), '400')        # 300 = 15pt
-            tr_height.set(qn('w:hRule'), 'exact')    # 높이 고정
+            tr_height.set(qn('w:val'), '400')        
+            tr_height.set(qn('w:hRule'), 'exact')
             tr_pr.append(tr_height)
 
             is_shaded = i % 2 == 0
