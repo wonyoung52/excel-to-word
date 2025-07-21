@@ -46,6 +46,16 @@ title_input = st.text_input("Title", value="2024 족보")
 file_name_input = st.text_input("File Name", value="제목 없음")
 
 # ---------------------------- GPT 처리 함수 ----------------------------
+def add_paragraph(text, bold=False, line_break=False):
+    para = doc.add_paragraph()
+    run = para.add_run(text)
+    run.bold = bold
+    para.paragraph_format.line_spacing = Pt(15)
+    para.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
+    if line_break:
+        run.add_break()
+    return para
+
 def process_question(number, q_text, client, doc):
     prompt = f"""
 문제와 선지를 분리해주세요. 문제는 한 문장, 선지는 '① 선택지내용' 형식으로 출력해주세요. 선지는 최대한 원문 그대로 보존하되 오타나 맞춤법 이상이 있다면 틀린 부분만 교정해주세요.
