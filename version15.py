@@ -96,9 +96,9 @@ if api_key and uploaded_file and title_input and file_name_input:
         doc.add_paragraph()
 
         # ---------------------------- 교수정보 표 ----------------------------
-        table = doc.add_table(rows=3, cols=5)
+        table = doc.add_table(rows=5, cols=3)
         table.style = 'Table Grid'
-        headers = ["교수님", "번호", "담당 강의 (시수)", "", ""]
+        headers = ["교수님", "번호", "담당 강의 (시수)"]
         for i, header in enumerate(headers):
             cell = table.cell(0, i)
             para = cell.paragraphs[0]
