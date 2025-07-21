@@ -111,7 +111,13 @@ if api_key and uploaded_file and title_input and file_name_input:
     with st.spinner("Generating..."):
         client = OpenAI(api_key=api_key)
         df = pd.read_excel(uploaded_file, header=0)
-        question_columns = list(range(2, df.shape[1], 3))
+
+        if "사진 자료" in df.columns:
+            photo_col_idx = df.columns.get_loc("사진 자료")
+        else:
+            photo_col_idx = df.shape[1]
+        
+        question_columns = [i for i in range(2, photo_col_idx, 3)]
         max_q_number = 0
 
         doc = Document()
