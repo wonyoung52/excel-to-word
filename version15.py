@@ -204,11 +204,11 @@ if api_key and uploaded_file and title_input and file_name_input:
 
         for i in range(total_rows):
             row = table.rows[i]
-            
+
             tr = row._tr
             tr_pr = tr.get_or_add_trPr()
             tr_height = OxmlElement('w:trHeight')
-            tr_height.set(qn('w:val'), '300')        # 300 = 15pt
+            tr_height.set(qn('w:val'), '400')        # 300 = 15pt
             tr_height.set(qn('w:hRule'), 'exact')    # 높이 고정
             tr_pr.append(tr_height)
 
