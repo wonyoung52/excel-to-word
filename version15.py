@@ -66,7 +66,7 @@ def process_question(number, q_text, client, doc):
     """
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-5.4-mini",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
         )
