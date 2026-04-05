@@ -66,8 +66,8 @@ def process_question(number, q_text, client, doc):
     """
     try:
         response = client.responses.create(
-        model="gpt-5-mini",   # 또는 gpt-5.3-chat-latest
-        input=prompt
+            model="gpt-5-mini",   # 또는 gpt-5.3-chat-latest
+            input=prompt
         )
         content = response.output[0].content[0].text.strip()
     except:
