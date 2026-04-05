@@ -16,7 +16,7 @@ title_input = st.text_input("Title", value="2024 족보")
 file_name_input = st.text_input("File Name", value="제목 없음")
 
 
-# 🔥 GPT 응답 안전 파싱 함수
+# ---------------- GPT 응답 파싱 ----------------
 def get_text_from_response(response):
     try:
         return response.output[0].content[0].text
@@ -46,14 +46,10 @@ def process_question(number, q_text, client, doc):
 
     try:
         response = client.responses.create(
-            model="gpt-5.3-chat-latest",   # 🔥 가장 안정적
+            model="gpt-5.3-chat-latest",
             input=prompt
         )
-
         content = get_text_from_response(response).strip()
-
-        # 🔥 디버깅 (문제 있으면 이거 보고 바로 알 수 있음)
-        # st.write(content)
 
     except Exception as e:
         st.error(e)
@@ -71,11 +67,9 @@ def process_question(number, q_text, client, doc):
         elif s.startswith(("①", "②", "③", "④", "⑤")):
             choices.append(s)
 
-    # 🔥 fallback (핵심)
     if not question_line:
         question_line = lines[0] if lines else "복원 실패"
 
-    # ---------------- docx 작성 ----------------
     try:
         para_q = doc.add_paragraph()
         para_q.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY
@@ -129,28 +123,37 @@ if st.button("Convert"):
         run.font.size = Pt(16)
         doc.add_paragraph()
 
-        # ---------------- 문제 처리 ----------------
-        max_q_number = 0
+        # 🔥 핵심: 3번째 열부터 문제 시작
+        # 구조: [날짜][이름][번호][문제][빈칸][번호][문제]...
 
-        for i in range(len(df)):
-            try:
-                number = int(df.iloc[i, 0]) if not pd.isna(df.iloc[i, 0]) else "?"
-                q_text = df.iloc[i, 1]
+        for col in range(2, df.shape[1], 3):
 
-                if pd.isna(q_text):
+            for i in range(len(df)):
+
+                try:
+                    number_raw = df.iloc[i, col]
+                    q_text = df.iloc[i, col + 1]
+
+                    # 안전한 번호 처리
+                    try:
+                        number = int(number_raw)
+                    except:
+                        number = str(number_raw) if not pd.isna(number_raw) else "?"
+
+                    if pd.isna(q_text):
+                        p = doc.add_paragraph()
+                        p.add_run(f"{number}. 복원 실패").bold = True
+                        doc.add_paragraph()
+                        continue
+
+                    process_question(number, q_text, client, doc)
+
+                except Exception as e:
                     p = doc.add_paragraph()
-                    p.add_run(f"{number}. 복원 실패").bold = True
+                    p.add_run(f"복원 실패: {e}").bold = True
                     doc.add_paragraph()
-                    continue
 
-                process_question(number, q_text, client, doc)
-
-            except Exception as e:
-                p = doc.add_paragraph()
-                p.add_run(f"복원 실패: {e}").bold = True
-                doc.add_paragraph()
-
-        # ---------------- 다운로드 ----------------
+        # 다운로드
         buffer = BytesIO()
         doc.save(buffer)
         buffer.seek(0)
