@@ -65,12 +65,11 @@ def process_question(number, q_text, client, doc):
 입력: {str(q_text)}
     """
     try:
-        response = client.chat.completions.create(
-            model="gpt-5.4-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
-        )
-        content = response.choices[0].message.content.strip()
+        response = client.responses.create(
+        model="gpt-5-mini",   # 또는 gpt-5.3-chat-latest
+        input=prompt
+    )
+    content = response.output[0].content[0].text.strip()
     except:
         content = f"문제: 오류코드 000"
 
