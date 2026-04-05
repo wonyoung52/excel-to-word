@@ -30,6 +30,22 @@ def get_text_from_response(response):
             return ""
 
 
+# ---------------- 가로선 ----------------
+def add_horizontal_line(paragraph):
+    p = paragraph._element
+    p_pr = p.get_or_add_pPr()
+
+    border = OxmlElement('w:pBdr')
+    bottom = OxmlElement('w:bottom')
+
+    bottom.set(qn('w:val'), 'single')
+    bottom.set(qn('w:sz'), '12')
+    bottom.set(qn('w:color'), '000000')
+
+    border.append(bottom)
+    p_pr.append(border)
+
+
 # ---------------- GPT 처리 ----------------
 def process_question(number, q_text, client, doc):
     prompt = f"""
@@ -128,20 +144,25 @@ if st.button("Convert"):
         table = doc.add_table(rows=5, cols=3)
         table.style = 'Table Grid'
         headers = ["교수님", "번호", "담당 강의 (시수)"]
+
         for i, header in enumerate(headers):
             cell = table.cell(0, i)
             para = cell.paragraphs[0]
             para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-            run = para.add_run(header)
-            run.bold = True
+            para.add_run(header).bold = True
 
         doc.add_paragraph()
 
         # ---------------- 문제 처리 ----------------
         max_q_number = 0
 
-        # 🔥 핵심: 3번째 열부터 시작
-        for col in range(2, df.shape[1], 3):
+        # 🔥 사진자료 이후 제외
+        if "사진 자료" in df.columns:
+            photo_col_idx = df.columns.get_loc("사진 자료")
+        else:
+            photo_col_idx = df.shape[1]
+
+        for col in range(2, photo_col_idx, 3):
             for i in range(len(df)):
 
                 try:
@@ -169,18 +190,33 @@ if st.button("Convert"):
                     p.add_run(f"복원 실패: {e}").bold = True
                     doc.add_paragraph()
 
-        # ---------------- 해설 표 ----------------
-        doc.add_paragraph()
+        # ---------------- 정답 및 해설 ----------------
+        p = doc.add_paragraph()
+        add_horizontal_line(p)
         doc.add_paragraph("정답 및 해설").runs[0].bold = True
 
         total_rows = math.ceil(max_q_number / 5 * 2)
         table = doc.add_table(rows=total_rows, cols=5)
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
 
+        # 테두리
+        tbl = table._tbl
+        tbl_pr = tbl.tblPr
+        borders = OxmlElement('w:tblBorders')
+
+        for b in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
+            border = OxmlElement(f'w:{b}')
+            border.set(qn('w:val'), 'single')
+            border.set(qn('w:sz'), '4')
+            border.set(qn('w:color'), '000000')
+            borders.append(border)
+
+        tbl_pr.append(borders)
+
+        # 내용 + 회색
         for i in range(total_rows):
-            row = table.rows[i]
             for j in range(5):
-                cell = row.cells[j]
+                cell = table.rows[i].cells[j]
                 para = cell.paragraphs[0]
                 para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
@@ -189,13 +225,17 @@ if st.button("Convert"):
                     if value <= max_q_number:
                         para.add_run(str(value))
 
+                    # 회색 배경
+                    shading = OxmlElement("w:shd")
+                    shading.set(qn("w:val"), "clear")
+                    shading.set(qn("w:fill"), "D9D9D9")
+                    cell._tc.get_or_add_tcPr().append(shading)
+
         # ---------------- 총평 ----------------
-        doc.add_paragraph()
-        doc.add_paragraph("강의 총평").runs[0].bold = True
-        doc.add_paragraph()
-        doc.add_paragraph("족관 총평").runs[0].bold = True
-        doc.add_paragraph()
-        doc.add_paragraph("시험 난이도").runs[0].bold = True
+        for text in ["강의 총평", "족관 총평", "시험 난이도"]:
+            p = doc.add_paragraph()
+            add_horizontal_line(p)
+            doc.add_paragraph(text).runs[0].bold = True
 
         # ---------------- 다운로드 ----------------
         buffer = BytesIO()
